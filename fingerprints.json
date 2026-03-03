@@ -1,0 +1,115 @@
+{
+  "endpoints": {
+    "/": ["GET"],
+    "/api/health": ["GET"],
+    "/api/v1/agents": ["GET", "POST"],
+    "/api/v1/sessions": ["GET"],
+    "/api/v1/tools": ["GET"],
+    "/api/v1/memory": ["GET"],
+    "/.well-known/ai-agent": ["GET"],
+    "/api/status": ["GET"],
+    "/api/version": ["GET"],
+    "/health": ["GET"],
+    "/healthz": ["GET"],
+    "/metrics": ["GET"],
+    "/api/v1/chat": ["POST"],
+    "/api/v1/completions": ["POST"],
+    "/ws": ["GET"],
+    "/websocket": ["GET"],
+    "/api/docs": ["GET"],
+    "/api/swagger": ["GET"],
+    "/openapi.json": ["GET"],
+    "/api/v1/config": ["GET"],
+    "/.env": ["GET"],
+    "/config.json": ["GET"],
+    "/api/v1/models": ["GET"],
+    "/api/v1/prompts": ["GET"]
+  },
+
+  "headers": [
+    "X-OpenClaw-Version",
+    "X-OpenClaw-Agent",
+    "X-Agent-Framework",
+    "X-AI-Gateway",
+    "X-Powered-By",
+    "Server",
+    "X-Agent-ID",
+    "X-Session-ID",
+    "X-Request-ID",
+    "X-OpenClaw-Node"
+  ],
+
+  "keywords": [
+    "openclaw",
+    "ai-agent",
+    "agent-gateway",
+    "claude",
+    "anthropic",
+    "tool_use",
+    "agent_id",
+    "session_id",
+    "model_name",
+    "agent-framework"
+  ],
+
+  "json_keys": [
+    "agents",
+    "tools",
+    "sessions",
+    "models",
+    "version",
+    "agent_id",
+    "capabilities",
+    "endpoints"
+  ],
+
+  "error_patterns": [
+    "openclaw.*error",
+    "agent.*not.*found",
+    "invalid.*agent.*id",
+    "session.*expired",
+    "tool.*execution.*failed"
+  ],
+
+  "websocket_endpoints": [
+    "/ws",
+    "/websocket",
+    "/api/v1/ws"
+  ],
+
+  "weights": {
+    "Header: X-OpenClaw": 50,
+    "Header: X-Agent": 30,
+    "Keyword 'openclaw'": 40,
+    "Keyword 'ai-agent'": 30,
+    "JSON key 'agents'": 25,
+    "Agent API accessible": 35,
+    "WebSocket endpoint": 20,
+    "API documentation": 15,
+    "default": 5
+  },
+
+  "confidence_thresholds": {
+    "HIGH": 80,
+    "MEDIUM": 40,
+    "LOW": 0
+  },
+
+  "scanner_config": {
+    "default_ports": [80, 443, 8080, 8443, 3000, 5000, 8000, 9000],
+    "user_agent": "OpenClaw-Scanner/2.0",
+    "retry_backoff_factor": 0.3,
+    "retry_status_forcelist": [429, 500, 502, 503, 504],
+    "pool_connections": 100,
+    "pool_maxsize": 100,
+    "websocket_status_codes": [101, 426],
+    "header_match_keywords": ["openclaw", "agent"]
+  },
+
+  "output_colors": {
+    "HIGH": "\u001b[91m",
+    "MEDIUM": "\u001b[93m",
+    "LOW": "\u001b[92m",
+    "RESET": "\u001b[0m"
+  }
+}

@@ -1,0 +1,28 @@
+# OpenClaw 扫描器目标文件示例
+# 支持的格式：IP地址、IP:PORT、CIDR、域名、完整URL
+# 以 # 开头的行为注释
+
+# 单个IP地址（自动扫描所有默认端口）
+192.168.1.100
+10.0.0.50
+
+# IP地址指定端口
+192.168.1.101:8080
+172.16.0.10:3000
+
+# CIDR格式（扫描整个网段）
+192.168.1.0/24
+10.0.0.0/28
+
+# 域名（自动尝试HTTP/HTTPS）
+example.com
+api.example.com
+
+# 完整URL
+http://example.com:8080
+https://api.example.com:443
+http://192.168.1.200:5000
+
+# 混合使用
+internal-server.local
+172.16.10.0/29

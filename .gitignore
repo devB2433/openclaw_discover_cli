@@ -1,0 +1,32 @@
+# 文档和参考资料
+DETECTION_GUIDE.md
+FireShot Capture 014 - Hunting OpenClaw Exposures_ CVE-2026-25253 in Internet-Facing AI Ag_ - [hunt.io].pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# 扫描结果
+results.json
+*.json.bak
+scan_*.json
+
+# 目标文件
+targets.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
