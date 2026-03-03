@@ -1,214 +1,125 @@
-# OpenClaw 指纹扫描器 - 快速上手指南
+# OpenClaw Fingerprint Scanner - Quick Start Guide
 
-## 快速开始
+[English](USAGE.md) | [简体中文](USAGE_CN.md)
 
-### 1. 安装依赖
+## Quick Start
+
+### 1. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. 基础扫描
+### 2. Basic Scanning
 
 ```bash
-# 扫描单个IP
+# Scan single IP
 python scanner.py -t 192.168.1.100
 
-# 扫描C段
+# Scan C-class network
 python scanner.py -t 192.168.1.0/24
 
-# 扫描指定端口
+# Scan specific port
 python scanner.py -t 192.168.1.100:8080
 ```
 
-## 常用场景
+## Common Scenarios
 
-### 场景1：快速扫描C段
+### Scenario 1: Fast C-Class Scan
 
 ```bash
 python scanner.py -t 192.168.1.0/24 --realtime -w 50
 ```
 
-- `--realtime`: 实时显示发现的目标
-- `-w 50`: 使用50个并发线程
+- `--realtime`: Display targets as discovered
+- `-w 50`: Use 50 concurrent threads
 
-### 场景2：批量扫描多个网段
+### Scenario 2: Batch Scan Multiple Networks
 
-创建目标文件 `targets.txt`:
+Create target file `targets.txt`:
 ```
 192.168.1.0/24
 10.0.0.0/24
 172.16.0.0/28
 ```
 
-执行扫描:
+Execute scan:
 ```bash
 python scanner.py -f targets.txt --realtime -o results.json --stats
 ```
 
-### 场景3：隐蔽扫描
+### Scenario 3: Stealth Scan
 
-**什么是隐蔽扫描？**
+**What is Stealth Scanning?**
 
-隐蔽扫描是指降低扫描活动的可见性，避免被目标系统的安全设备（IDS/IPS、WAF、防火墙）检测到。
+Stealth scanning reduces scan visibility to avoid detection by security devices (IDS/IPS, WAF, firewalls).
 
-**为什么需要隐蔽扫描？**
-- 避免触发安全告警
-- 避免IP被封禁
-- 避免影响目标服务性能
-- 满足渗透测试合规要求
+**Why Use Stealth Scanning?**
+- Avoid triggering security alerts
+- Prevent IP blocking
+- Minimize service impact
+- Meet compliance requirements
 
-**隐蔽扫描命令：**
+**Stealth Scan Command:**
 ```bash
 python scanner.py -t 192.168.1.0/24 -w 5 --rate-limit 2 --timeout 10
 ```
 
-**参数说明：**
-- `-w 5`: 低并发（5个线程，而不是50个）
-- `--rate-limit 2`: 每个请求间隔2秒（模拟正常访问）
-- `--timeout 10`: 长超时（更有耐心）
+**Parameters:**
+- `-w 5`: Low concurrency (5 threads instead of 50)
+- `--rate-limit 2`: 2-second interval between requests (mimics normal access)
+- `--timeout 10`: Long timeout (more patient)
 
-**对比：**
+**Comparison:**
 ```bash
-# 快速扫描（容易被发现）
+# Fast scan (easily detected)
 python scanner.py -t 192.168.1.0/24 -w 100 --timeout 3
-# 特征：短时间大量请求，明显的扫描行为
+# Characteristics: High volume in short time, obvious scanning behavior
 
-# 隐蔽扫描（不易被发现）
+# Stealth scan (hard to detect)
 python scanner.py -t 192.168.1.0/24 -w 5 --rate-limit 2 --timeout 10
-# 特征：流量分散，像正常用户访问
+# Characteristics: Distributed traffic, resembles normal user access
 ```
 
-### 场景4：高置信度筛选
+### Scenario 4: High Confidence Filter
 
 ```bash
 python scanner.py -f targets.txt --min-confidence HIGH -o high_confidence.json
 ```
 
-只输出高置信度的结果。
+Output only high-confidence results.
 
-## 命令行参数详解
+## Configuration File
 
-### 目标参数
+Scanner uses `fingerprints.json` for all detection features and parameters.
 
-| 参数 | 说明 | 示例 |
-|------|------|------|
-| `-t, --target` | 单个目标 | `-t 192.168.1.0/24` |
-| `-f, --file` | 目标文件 | `-f targets.txt` |
-
-### 性能参数
-
-| 参数 | 默认值 | 说明 |
-|------|--------|------|
-| `-w, --workers` | 20 | 并发线程数 |
-| `--timeout` | 5 | 请求超时(秒) |
-| `--retry` | 2 | 重试次数 |
-| `--rate-limit` | 0 | 请求间隔(秒) |
-| `--ports` | - | 自定义端口列表 |
-
-### 输出参数
-
-| 参数 | 说明 |
-|------|------|
-| `-o, --output` | 保存JSON结果 |
-| `-v, --verbose` | 详细输出 |
-| `--realtime` | 实时输出发现的目标 |
-| `--no-progress` | 禁用进度条 |
-| `--stats` | 显示统计信息 |
-
-### 过滤参数
-
-| 参数 | 说明 |
-|------|------|
-| `--min-confidence` | 最小置信度 (LOW/MEDIUM/HIGH) |
-| `--config` | 指定配置文件 |
-
-## 目标格式
-
-支持以下格式：
-
-```
-# IP地址
-192.168.1.100
-
-# IP:PORT
-192.168.1.100:8080
-
-# CIDR网段
-192.168.1.0/24
-10.0.0.0/16
-
-# 域名
-example.com
-api.example.com
-
-# 完整URL
-http://example.com:8080
-https://api.example.com
-```
-
-## 输出说明
-
-### 置信度级别
-
-- **HIGH** (红色): 分数 >= 80，强烈匹配
-- **MEDIUM** (黄色): 分数 >= 40，可能匹配
-- **LOW** (绿色): 分数 < 40，弱匹配
-
-### 实时输出示例
-
-```
-扫描进度 |████████| 500/2032 [00:30<01:45, 14.5url/s] 发现:3
-[发现] http://192.168.1.100:8080 [置信度: HIGH | 分数: 125]
-[发现] http://192.168.1.105:3000 [置信度: MEDIUM | 分数: 65]
-```
-
-### 详细输出 (-v)
+### Using Custom Configuration
 
 ```bash
-python scanner.py -t 192.168.1.100 -v
+# Specify config file
+python scanner.py -t 192.168.1.100 --config my_config.json
 ```
 
-输出:
-```
-[+] http://192.168.1.100:8080 [置信度: HIGH | 分数: 125]
-    - Header: X-OpenClaw-Version=1.2.3
-    - Keyword 'openclaw' at /
-    - JSON key 'agents' at /api/v1/agents
-    - Agent API accessible (GET)
-```
+### Configuration Structure
 
-## 性能优化建议
-
-### 快速扫描
-```bash
-python scanner.py -t 192.168.1.0/24 -w 100 --timeout 3 --retry 1
-```
-
-### 平衡模式
-```bash
-python scanner.py -t 192.168.1.0/24 -w 20 --timeout 5 --retry 2
-```
-
-### 隐蔽模式
-```bash
-python scanner.py -t 192.168.1.0/24 -w 5 --timeout 10 --rate-limit 2
-```
-
-## 自定义配置
-
-### 修改默认端口
-
-编辑 `fingerprints.json`:
 ```json
 {
-  "scanner_config": {
-    "default_ports": [80, 443, 8080, 8443, 3000, 5000]
-  }
+  "endpoints": {},           // API endpoints
+  "headers": [],            // Response headers
+  "keywords": [],           // Keywords
+  "json_keys": [],          // JSON structure
+  "error_patterns": [],     // Error patterns
+  "websocket_endpoints": [], // WebSocket endpoints
+  "weights": ,            // Feature weights
+  "confidence_thresholds": {}, // Confidence thresholds
+  "scanner_config": {},     // Scanner parameters
+  "output_colors": {}       // Output colors
 }
 ```
 
-### 添加自定义特征
+### Custom Features
+
+Edit `fingerprints.json` to add new features:
 
 ```json
 {
@@ -224,57 +135,194 @@ python scanner.py -t 192.168.1.0/24 -w 5 --timeout 10 --rate-limit 2
 }
 ```
 
-### 使用自定义配置
+## Command Line Parameters
+
+### Target Parameters
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `-t, --target` | Single target | `-t 192.168.1.0/24` |
+| `-f, --file` | Target file | `-f targets.txt` |
+
+### Performance Parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `-w, --workers` | 20 | Concurrent threads |
+| `--timeout` | 5 | Request timeout (seconds) |
+| `--retry` | 2 | Retry attempts |
+| `--rate-limit` | 0 | Request interval (seconds) |
+| `--ports` | - | Custom port list |
+
+### Output Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `-o, --output` | Save JSON results |
+| `-v, --verbose` | Detailed output |
+| `--realtime` | Real-time discovery output |
+| `--no-progress` | Disable progress bar |
+| `--stats` | Show statistics |
+
+### Filter Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `--min-confidence` | Minimum confidence (LOW/MEDIUM/HIGH) |
+| `--config` | Specify config file |
+
+## Target Formats
+
+Supports the following formats:
+
+```
+# IP address
+192.168.1.100
+
+# IP:PORT
+192.168.1.100:8080
+
+# CIDR notation
+192.168.1.0/24
+10.0.0.0/16
+
+# Domain
+example.com
+api.example.com
+
+# Full URL
+http://example.com:8080
+https://api.example.com
+```
+
+## Output Description
+
+### Confidence Levels
+
+- **HIGH** (Red): Score >= 80, strong match
+- **MEDIUM** (Yellow): Score >= 40, possible match
+- **LOW** (Green): Score < 40, weak match
+
+### Real-time Output Example
+
+```
+Scanning progress |████████| 500/2032 [00:30<01:45, 14.5url/s] Found:3
+[Found] http://192.168.1.100:8080 [Confidence: HIGH | Score: 125]
+[Found] http://192.168.1.105:3000 [Confidence: MEDIUM | Score: 65]
+```
+
+### Detailed Output (-v)
+
+```bash
+python scanner.py -t 192.168.1.100 -v
+```
+
+Output:
+```
+[+] http://192.168.1.100:8080 [Confidence: HIGH | Score: 125]
+    - Header: X-OpenClaw-Version=1.2.3
+    - Keyword 'openclaw' at /
+    - JSON key 'agents' at /api/v1/agents
+    - Agent API accessible (GET)
+```
+
+## Performance Optimization
+
+### Fast Scan
+```bash
+python scanner.py -t 192.168.1.0/24 -w 100 --timeout 3 --retry 1
+```
+
+### Balanced Mode
+```bash
+python scanner.py -t 192.168.1.0/24 -w 20 --timeout 5 --retry 2
+```
+
+### Stealth Mode
+```bash
+python scanner.py -t 192.168.1.0/24 -w 5 --timeout 10 --rate-limit 2
+```
+
+## Custom Configuration
+
+### Modify Default Ports
+
+Edit `fingerprints.json`:
+```json
+{
+  "scanner_config": {
+    "default_ports": [80, 443, 8080, 8443, 3000, 5000]
+  }
+}
+```
+
+### Add Custom Features
+
+```json
+{
+  "endpoints": {
+    "/my/custom/api": ["GET"]
+  },
+  "keywords": [
+    "my-framework"
+  ],
+  "weights": {
+    "Keyword 'my-framework'": 50
+  }
+}
+```
+
+### Use Custom Config
 
 ```bash
 python scanner.py -t 192.168.1.100 --config my_config.json
 ```
 
-## 常见问题
+## FAQ
 
-### Q: 如何扫描多个C段？
+### Q: How to scan multiple C-class networks?
 
-A: 创建目标文件，每行一个CIDR:
+A: Create target file with one CIDR per line:
 ```bash
 echo "192.168.1.0/24" > targets.txt
 echo "192.168.2.0/24" >> targets.txt
 python scanner.py -f targets.txt --realtime
 ```
 
-### Q: 如何只扫描特定端口？
+### Q: How to scan specific ports only?
 
-A: 使用 `--ports` 参数:
+A: Use `--ports` parameter:
 ```bash
 python scanner.py -t 192.168.1.0/24 --ports 80,443,8080
 ```
 
-### Q: 扫描速度太慢怎么办？
+### Q: Scan is too slow?
 
-A: 增加并发数，减少超时:
+A: Increase concurrency, reduce timeout:
 ```bash
 python scanner.py -t 192.168.1.0/24 -w 100 --timeout 3
 ```
 
-### Q: 如何避免被检测？
+### Q: How to avoid detection?
 
-A: 降低并发，增加间隔:
+A: Lower concurrency, add intervals:
 ```bash
 python scanner.py -t 192.168.1.0/24 -w 5 --rate-limit 2
 ```
 
-### Q: 如何保存扫描结果？
+### Q: How to save scan results?
 
-A: 使用 `-o` 参数:
+A: Use `-o` parameter:
 ```bash
 python scanner.py -f targets.txt -o results.json
 ```
 
-## 完整示例
+## Complete Examples
 
-### 示例1: 企业内网扫描
+### Example 1: Enterprise Internal Network Scan
 
 ```bash
-# 扫描多个内网段，实时输出，保存结果
+# Scan multiple internal networks, real-time output, save results
 python scanner.py -f internal_networks.txt \
   --realtime \
   -w 50 \
@@ -283,10 +331,10 @@ python scanner.py -f internal_networks.txt \
   --stats
 ```
 
-### 示例2: 外网目标扫描
+### Example 2: External Target Scan
 
 ```bash
-# 谨慎扫描外网目标
+# Cautious scan of external targets
 python scanner.py -f external_targets.txt \
   -w 10 \
   --rate-limit 1 \
@@ -295,35 +343,31 @@ python scanner.py -f external_targets.txt \
   -o external_results.json
 ```
 
-### 示例3: 快速验证
+### Example 3: Quick Verification
 
 ```bash
-# 快速验证单个目标
+# Quick verification of single target
 python scanner.py -t 192.168.1.100:8080 -v
 ```
 
-## 注意事项
+## Important Notes
 
-⚠️ **重要提示**:
-1. 仅在授权范围内使用
-2. 遵守目标系统的访问策略
-3. 控制扫描速率避免影响服务
-4. 注意法律法规要求
-5. 建议先小范围测试再大规模扫描
+⚠️ **Important**:
+1. Use only on authorized systems
+2. Comply with target system access policies
+3. Control scan rate to avoid service impact
+4. Follow applicable laws and regulations
+5. Test on small scale before large-scale scanning
 
-## 获取帮助
+## Getting Help
 
 ```bash
-# 查看所有参数
+# View all parameters
 python scanner.py --help
-
-# 查看版本信息
-python scanner.py --version
 ```
 
-## 相关文档
+## Related Documentation
 
-- `README.md` - 完整使用说明
-- `DETECTION_GUIDE.md` - 检测技术文档
-- `fingerprints.json` - 指纹配置文件
-- `targets.txt.example` - 目标文件示例
+- `README.md` - Complete usage guide
+- `fingerprints.json` - Fingerprint configuration
+- `targets.txt.example` - Target file example
